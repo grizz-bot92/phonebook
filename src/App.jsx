@@ -3,6 +3,7 @@ import axios from 'axios'
 import Contacts from './components/Contacts'
 import Filter from './components/Filter'
 import Person from './components/Person'
+import personUpdate from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -12,12 +13,10 @@ const App = () => {
   const [filterText, setFilterText] = useState('')
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+    personUpdate
+      .getAll()
+      .then(initialPerson => {
+        setPersons(initialPerson)
       })
   }, [])
   
@@ -33,6 +32,7 @@ const App = () => {
       name: newName,
       number: newNumber,
     }
+
     if(
       persons.some(person => person.name === personObject.name) &&
       persons.some(person => person.number === personObject.number)
@@ -40,9 +40,13 @@ const App = () => {
       window.alert(`${personObject.name} is already added to the phone book`)
     }
      else {
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+      personUpdate
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
     }
 
   }
