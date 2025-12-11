@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
 import Contacts from './components/Contacts'
 import Filter from './components/Filter'
 import Person from './components/Person'
@@ -51,13 +50,24 @@ const App = () => {
 
   }
 
+  const handleDelete = (id) => {
+    const contact = persons.find(c => c.id === id)
+    personUpdate
+      .delete(contact).then(
+        confirm('Delete ${persons.name}')
+        )
+        .catch(error => {
+          alert('contact already deleted')
+        
+      })
+      setPersons(persons.filter(p => p.id !== id))
+  }
+
   const handleNameChange = (event) =>{ 
-    console.log(event.target.value)
     setNewName(event.target.value)
   }
   
   const handleNumberChange = (event) => {
-    console.log(event.target.value)
     setNewNumber(event.target.value)
   }
 
@@ -92,7 +102,7 @@ const App = () => {
       <h2>Numbers</h2>
       <ul>
         {contactsToShow.map(person =>
-          <Contacts key={person.id} name={person.name} number={person.number}/>
+          <Contacts key={person.id} name={person.name} number={person.number} deleteContact={handleDelete}/>
         )}
       </ul>
     </div>
