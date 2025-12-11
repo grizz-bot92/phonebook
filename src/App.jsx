@@ -31,6 +31,13 @@ const App = () => {
       name: newName,
       number: newNumber,
     }
+  
+    if(persons.some(person => person.name === personObject.name)){
+      const confirmation = confirm(`${persons.name} is already added to the phonebook, replace the old number with a new one?`)
+      if(confirmation){
+        updateContact
+      }
+    }
 
     if(
       persons.some(person => person.name === personObject.name) &&
@@ -64,6 +71,17 @@ const App = () => {
         console.log(error)
       }) 
     }     
+  }
+
+  const updateContact = id => {
+    const contact = persons.find(c => c.id === id)
+    personUpdate
+      .update(id, ...contact).then(returnedContact => {
+        setPersons.concat(returnedContact)
+        setNewNumber(persons.map(person => person.id === id ? returnedContact : person))
+      })
+    
+    
   }
 
 
