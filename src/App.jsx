@@ -50,18 +50,22 @@ const App = () => {
 
   }
 
+
   const handleDelete = (id) => {
     const contact = persons.find(c => c.id === id)
-    personUpdate
-      .delete(contact).then(
-        confirm('Delete ${persons.name}')
-        )
-        .catch(error => {
-          alert('contact already deleted')
-        
-      })
-      setPersons(persons.filter(p => p.id !== id))
+    const confirmation = confirm(`Delete ${contact.name}`)
+
+    if(confirmation){
+      personUpdate
+        .deleteContact(contact.id)
+        .then(() =>
+          setPersons(prevPersons => prevPersons.filter(p => p.id !== id))
+      ).catch(error => {
+        console.log(error)
+      }) 
+    }     
   }
+
 
   const handleNameChange = (event) =>{ 
     setNewName(event.target.value)
@@ -102,7 +106,13 @@ const App = () => {
       <h2>Numbers</h2>
       <ul>
         {contactsToShow.map(person =>
-          <Contacts key={person.id} name={person.name} number={person.number} deleteContact={handleDelete}/>
+          <Contacts 
+            key={person.id} 
+            name={person.name} 
+            number={person.number}
+            id={person.id} 
+            deleteContact={handleDelete}
+          />
         )}
       </ul>
     </div>
