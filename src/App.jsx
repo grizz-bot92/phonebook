@@ -27,34 +27,40 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     const personObject = {
-      id: String(persons.length + 1),
       name: newName,
       number: newNumber,
     }
-  
-    if(persons.some(person => person.name === personObject.name)){
-      const confirmation = confirm(`${persons.name} is already added to the phonebook, replace the old number with a new one?`)
-      if(confirmation){
-        updateContact
-      }
-    }
-
-    if(
-      persons.some(person => person.name === personObject.name) &&
-      persons.some(person => person.number === personObject.number)
-    ){
-      window.alert(`${personObject.name} is already added to the phone book`)
-    }
-     else {
+    
+    const existingContact = persons.find(person => person.name === personObject.name)
+    
+    if(!existingContact){
       personUpdate
         .create(personObject)
         .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
+          setPersons(persons.concat(returnedPerson))            
           setNewName('')
           setNewNumber('')
         })
+        return
     }
+    
+    if(existingContact.number === personObject.number){
+      window.alert(`${personObject.name} is already added to the phone book`)
+      return
+    }
+    
+    const confirmation = confirm(`${existingContact.name} is already added to the phonebook, replace the old number with a new one?`)
+    if(!confirmation) return
 
+    const updatedContact  = { ...existingContact, number: personObject.number }
+
+    personUpdate.update(existingContact.id, updatedContact).then(returnedContact =>{
+      setPersons(prev => 
+        prev.map(p => (p.id === existingContact.id ? returnedContact : p))
+      )
+      setNewName('')
+      setNewNumber('')
+    })
   }
 
 
@@ -70,20 +76,8 @@ const App = () => {
       ).catch(error => {
         console.log(error)
       }) 
-    }     
-  }
-
-  const updateContact = id => {
-    const contact = persons.find(c => c.id === id)
-    personUpdate
-      .update(id, ...contact).then(returnedContact => {
-        setPersons.concat(returnedContact)
-        setNewNumber(persons.map(person => person.id === id ? returnedContact : person))
-      })
-    
-    
-  }
-
+    }
+  } 
 
   const handleNameChange = (event) =>{ 
     setNewName(event.target.value)
