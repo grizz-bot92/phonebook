@@ -3,6 +3,9 @@ import Contacts from './components/Contacts'
 import Filter from './components/Filter'
 import Person from './components/Person'
 import personUpdate from './services/persons'
+import Notification from './components/Notification'
+import './index.css'
+
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -10,6 +13,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterText, setFilterText] = useState('')
+  const [errorMessage, setErrorMessage] = useState('test message')
+
 
   useEffect(() => {
     personUpdate
@@ -38,6 +43,10 @@ const App = () => {
         .create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))            
+          setErrorMessage(`Added ${personObject.name}`)
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
           setNewName('')
           setNewNumber('')
         })
@@ -45,7 +54,12 @@ const App = () => {
     }
     
     if(existingContact.number === personObject.number){
-      window.alert(`${personObject.name} is already added to the phone book`)
+      setErrorMessage(
+        `${personObject.name} is already added to the phone book`
+      )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
       return
     }
     
@@ -54,13 +68,24 @@ const App = () => {
 
     const updatedContact  = { ...existingContact, number: personObject.number }
 
-    personUpdate.update(existingContact.id, updatedContact).then(returnedContact =>{
-      setPersons(prev => 
-        prev.map(p => (p.id === existingContact.id ? returnedContact : p))
-      )
-      setNewName('')
-      setNewNumber('')
-    })
+    personUpdate
+      .update(existingContact.id, updatedContact).then(returnedContact =>{
+        setPersons(prev => 
+          prev.map(p => (p.id === existingContact.id ? returnedContact : p))
+        )
+        setErrorMessage(`${updatedContact.name}'s number has been updated`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+        setNewName('')
+        setNewNumber('')
+      })
+      .catch(error => {
+        setErrorMessage(`${updatedContact.name} was already deleted from server`          
+        )
+        //need more.....
+      })
+
   }
 
 
@@ -95,6 +120,7 @@ const App = () => {
   return(
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage}/>
       <Filter
         filterText={filterText}
         handleFilter={handleFilter}

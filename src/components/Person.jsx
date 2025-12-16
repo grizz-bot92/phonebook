@@ -1,8 +1,8 @@
-const Person = ({newName, handleNameChange}) => {
+const Person = ({name, handleNameChange}) => {
     return(
         <div>
             Name: <input required
-                value={newName}
+                value={name}
                 onChange={handleNameChange}   
             />
         </div>
