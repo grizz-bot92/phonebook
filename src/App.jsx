@@ -13,7 +13,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [errorMessage, setErrorMessage] = useState('test message')
+  const [errorMessage, setErrorMessage] = useState(null)
 
 
   useEffect(() => {
@@ -81,9 +81,11 @@ const App = () => {
         setNewNumber('')
       })
       .catch(error => {
-        setErrorMessage(`${updatedContact.name} was already deleted from server`          
-        )
-        //need more.....
+        setErrorMessage(`${updatedContact.name} was already deleted from server`)
+        personUpdate.getAll().then(updatedContacts => {
+          setPersons(updatedContacts)
+        })
+
       })
 
   }
