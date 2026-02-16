@@ -50,6 +50,13 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        .catch(error => {
+          setErrorMessage(error.response?.data?.error) || error.message || "An unknown error occurred"
+        })
+        
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
         return
     }
     
